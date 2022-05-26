@@ -1,0 +1,29 @@
+version: "2"
+services:
+  nacos:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos-standalone-mysql8
+    env_file:
+      - ./env/nacos.env
+    volumes:
+      - ./init.d:/home/nacos/init.d
+      - ./conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: always
+  
+  mysql:
+    container_name: mysql8
+    extends:
+      file: ../common-services.yaml
+      service: nacos-mysql8
+    ports:
+      - "3306:3306"
+

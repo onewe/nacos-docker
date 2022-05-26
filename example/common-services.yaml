@@ -1,0 +1,33 @@
+version: "2"
+services:
+  nacos:
+    image: nacos-server:2.1.0
+    container_name: nacos
+    healthcheck:
+      test: ["CMD", "wget" ,"--spider","-q","http://127.0.0.1:8848/nacos/actuator/health"]
+      timeout: 2s
+      retries: 3
+      interval: 5s
+      start_period: 30s
+  nacos-mysql57:
+    container_name: mysql57
+    image: nacos-mysql57:2.1.0
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", '-u', 'root', '-proot']
+      timeout: 20s
+      retries: 3
+      interval: 5s
+      start_period: 30s
+  nacos-mysql8:
+    container_name: mysql8
+    image: nacos-mysql8:2.1.0
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", '-u', 'root', '-proot']
+      timeout: 20s
+      retries: 3
+      interval: 5s
+      start_period: 30s

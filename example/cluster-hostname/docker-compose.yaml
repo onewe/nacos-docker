@@ -1,0 +1,67 @@
+version: "2"
+services:
+  nacos1:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos1
+    hostname: nacos1
+    volumes:
+      - ./cluster-logs/nacos1:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    env_file:
+      - ./env/nacos.env
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nacos2:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos2
+    hostname: nacos2
+    volumes:
+      - ./cluster-logs/nacos2:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8849:8848"
+      - "9849:9848"
+    env_file:
+      - ./env/nacos.env
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nacos3:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos3
+    hostname: nacos3
+    volumes:
+      - ./cluster-logs/nacos3:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
+    ports:
+      - "8850:8848"
+      - "9850:9848"
+    env_file:
+      - ./env/nacos.env
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+
+  mysql:
+    container_name: mysql
+    extends:
+      file: ../common-services.yaml
+      service: nacos-mysql57
+    ports:
+      - "3306:3306"

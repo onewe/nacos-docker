@@ -1,0 +1,56 @@
+version: "2"
+services:
+  nacos1:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos1
+    hostname: nacos1
+    volumes:
+      - ./cluster-logs/nacos1:/home/nacos/logs
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9555:9555"
+    env_file:
+      - ./env/nacos.env
+    restart: on-failure
+    depends_on:
+      nacos2:
+        condition: service_started
+      nacos3:
+        condition: service_started
+
+  nacos2:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos2
+    hostname: nacos2
+    volumes:
+      - ./cluster-logs/nacos2:/home/nacos/logs
+    ports:
+      - "8849:8848"
+      - "9849:9848"
+    env_file:
+      - ./env/nacos.env
+    restart: always
+    depends_on:
+      nacos3:
+        condition: service_started
+    
+  
+  nacos3:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos3
+    hostname: nacos3
+    volumes:
+      - ./cluster-logs/nacos3:/home/nacos/logs
+    ports:
+      - "8850:8848"
+      - "9850:9848"
+    env_file:
+      - ./env/nacos.env
+    restart: always

@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 set -x
-export CUSTOM_SEARCH_NAMES="application,custom"
-export CUSTOM_SEARCH_LOCATIONS=${BASE_DIR}/init.d/,file:${BASE_DIR}/conf/
-export MEMBER_LIST=""
-PLUGINS_DIR="/home/nacos/plugins/peer-finder"
+export CUSTOM_SEARCH_NAMES="application"
+export CUSTOM_SEARCH_LOCATIONS=file:${BASE_DIR}/conf/
+PLUGINS_DIR="${BASE_DIR}/plugins/peer-finder"
+export JAVA_HOME="$(readlink -f `which java` | sed 's:/bin/java::')"
+
 function print_servers() {
   if [[ ! -d "${PLUGINS_DIR}" ]]; then
     echo "" >"$CLUSTER_CONF"
@@ -30,18 +31,23 @@ function print_servers() {
 #===========================================================================================
 # JVM Configuration
 #===========================================================================================
-if [[ "${MODE}" == "standalone" ]]; then
 
-  JAVA_OPT="${JAVA_OPT} -Xms${JVM_XMS} -Xmx${JVM_XMX} -Xmn${JVM_XMN}"
+JAVA_OPT="${JAVA_OPT} -server -Xms${JVM_XMS} -Xmx${JVM_XMX} -Xmn${JVM_XMN} -XX:MetaspaceSize=${JVM_MS} -XX:MaxMetaspaceSize=${JVM_MMS}"
+
+if [[ "${EMBEDDED_STORAGE}" == "true" ]]; then
+  JAVA_OPT="${JAVA_OPT} -DembeddedStorage=true"
+else
+  JAVA_OPT="${JAVA_OPT} -DembeddedStorage=false"
+fi
+
+if [[ "${NACOS_DEBUG}" == "y" ]]; then
+  JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
+fi
+
+if [[ "${MODE}" == "standalone" ]]; then
   JAVA_OPT="${JAVA_OPT} -Dnacos.standalone=true"
 else
-  if [[ "${EMBEDDED_STORAGE}" == "embedded" ]]; then
-    JAVA_OPT="${JAVA_OPT} -DembeddedStorage=true"
-  fi
-  JAVA_OPT="${JAVA_OPT} -server -Xms${JVM_XMS} -Xmx${JVM_XMX} -Xmn${JVM_XMN} -XX:MetaspaceSize=${JVM_MS} -XX:MaxMetaspaceSize=${JVM_MMS}"
-  if [[ "${NACOS_DEBUG}" == "y" ]]; then
-    JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
-  fi
+  JAVA_OPT="${JAVA_OPT} -Dnacos.standalone=false"
   JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${BASE_DIR}/logs/java_heapdump.hprof"
   JAVA_OPT="${JAVA_OPT} -XX:-UseLargePages"
   print_servers
@@ -73,15 +79,15 @@ if [[ ! -z "${IGNORED_INTERFACES}" ]]; then
   JAVA_OPT="${JAVA_OPT} -Dnacos.inetutils.ignored-interfaces=${IGNORED_INTERFACES}"
 fi
 
-### If turn on auth system:
-if [[ ! -z "${NACOS_AUTH_ENABLE}" ]]; then
-  JAVA_OPT="${JAVA_OPT} -Dnacos.core.auth.enabled=${NACOS_AUTH_ENABLE}"
-fi
-
 if [[ "${PREFER_HOST_MODE}" == "hostname" ]]; then
   JAVA_OPT="${JAVA_OPT} -Dnacos.preferHostnameOverIp=true"
+else
+  JAVA_OPT="${JAVA_OPT} -Dnacos.preferHostnameOverIp=false"
 fi
-JAVA_OPT="${JAVA_OPT} -Dnacos.member.list=${MEMBER_LIST}"
+
+if [[ ! -z "${MEMBER_LIST}" ]]; then
+  JAVA_OPT="${JAVA_OPT} -Dnacos.member.list=${MEMBER_LIST}"
+fi
 
 JAVA_MAJOR_VERSION=$($JAVA -version 2>&1 | sed -E -n 's/.* version "([0-9]*).*$/\1/p')
 if [[ "$JAVA_MAJOR_VERSION" -ge "9" ]]; then
@@ -99,6 +105,7 @@ JAVA_OPT="${JAVA_OPT} --spring.config.additional-location=${CUSTOM_SEARCH_LOCATI
 JAVA_OPT="${JAVA_OPT} --spring.config.name=${CUSTOM_SEARCH_NAMES}"
 JAVA_OPT="${JAVA_OPT} --logging.config=${BASE_DIR}/conf/nacos-logback.xml"
 JAVA_OPT="${JAVA_OPT} --server.max-http-header-size=524288"
+JAVA_OPT="${JAVA_OPT} --server.tomcat.accesslog.enabled=${TOMCAT_ACCESSLOG_ENABLED}"
 
 echo "Nacos is starting, you can docker logs your container"
-exec $JAVA ${JAVA_OPT}
+exec ${JAVA_HOME}/bin/java ${JAVA_OPT}

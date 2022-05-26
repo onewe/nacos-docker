@@ -1,0 +1,79 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Publish Docker snapshot image
+
+on:
+  push:
+    branches:
+      - 'develop'
+  schedule:
+    - cron: '0 */8 * * *'
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the nacos repo
+        uses: actions/checkout@v2
+        with:
+          repository: 'alibaba/nacos'
+          ref: 'develop'
+          path: 'nacos'
+      - name: Check out the docker repo
+        uses: actions/checkout@v2
+        with:
+          path: 'docker'
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.3.0
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          cache: 'maven'
+      - name: Build nacos distribution from source code
+        run: | 
+            cd nacos && mvn -Prelease-nacos -Dmaven.test.skip=true clean install -U -Dproject.version=snapshot && cd ..
+            mv ./nacos/distribution/target/nacos-server-snapshot.tar.gz ./docker/build/nacos-server-snapshot.tar.gz
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - name: build nacos snapshot docker image
+        uses: docker/build-push-action@v2.3.0
+        with:
+          context: ./docker/build
+          file: ./docker/build/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/nacos-server:snapshot
+          target: nacos-snapshot
+          platforms: linux/amd64,linux/arm64
+      - name: build mysql 5.7 snapshot
+        uses: docker/build-push-action@v2.3.0
+        with:
+          context: ./docker/build
+          file: ./docker/build/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/mysql-57:snapshot
+          target: mysql5.7-snapshot
+          platforms: linux/amd64  
+      - name: build mysql 8 snapshot
+        uses: docker/build-push-action@v2.3.0
+        with:
+          context: ./docker/build
+          file: ./docker/build/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/mysql-8:snapshot
+          target: mysql8-snapshot
+          platforms: linux/amd64
+        
+      

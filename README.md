@@ -1,6 +1,9 @@
 # Nacos Docker
 
-![Docker Pulls](https://img.shields.io/docker/pulls/nacos/nacos-server.svg?maxAge=60480)
+![Docker Pulls](https://img.shields.io/docker/pulls/onewe/nacos-server)
+![Docker release build](https://img.shields.io/github/workflow/status/onewe/nacos-docker/Publish%20Docker%20release%20image?label=nacos-release-build)
+![Docker snapshot build](https://img.shields.io/github/workflow/status/onewe/nacos-docker/Publish%20Docker%20snapshot%20image?label=nacos-snapshot-build)
+![Docker image version](https://img.shields.io/docker/v/onewe/nacos-server)
 
 This project contains a Docker image meant to facilitate the deployment of [Nacos](https://github.com/alibaba/nacos).
 

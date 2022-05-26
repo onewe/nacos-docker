@@ -1,0 +1,13 @@
+version: "2"
+services:
+  nacos:
+    extends:
+      file: ../common-services.yaml
+      service: nacos
+    container_name: nacos-standalone
+    environment:
+      - PREFER_HOST_MODE=ip
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9555:9555"
