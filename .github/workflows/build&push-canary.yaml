@@ -35,8 +35,9 @@ jobs:
           cache: 'maven'
       - name: Build nacos distribution from source code
         run: | 
-            cd nacos && mvn -Prelease-nacos -Dmaven.test.skip=true clean install -U -Dproject.version=snapshot && cd ..
-            mv ./nacos/distribution/target/nacos-server-snapshot.tar.gz ./docker/build/nacos-server-snapshot.tar.gz
+            cd nacos && mvn -Prelease-nacos -Dmaven.test.skip=true clean install -U -pl console -am
+            mvn -Prelease-nacos -Dmaven.test.skip=true clean install -U -Dproject.version=snapshot -pl distribution
+            cd .. && mv ./nacos/distribution/target/nacos-server-snapshot.tar.gz ./docker/build/nacos-server-snapshot.tar.gz
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
