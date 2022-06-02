@@ -36,27 +36,46 @@
 * 例子演示中使用的数据库是为了方便定制了官方Mysql镜像, 自动初始化的数据库脚本.
 * 如果你使用自定义数据库,
   第一次启动Nacos前需要手动初始化 [数据库脚本](https://github.com/alibaba/nacos/blob/develop/distribution/conf/nacos-mysql.sql) .
+* 快照版本每隔8小时构建一次,若需要使用快照版本进行体验把镜像标签改为`snapshot`即可
 
-## 快速开始
+## 快速开始 docker
+
+* Standalone latest
+  
+  ```shell
+  docker run --rm -p 8848:8848 onewe/nacos-server:latest
+  ```
+
+* Standalone snapshot
+  
+  ```shell
+  docker run --rm -p 8848:8848 onewe/nacos-server:snapshot
+  ```
+
+* 打开浏览器
+  
+  link：http://127.0.0.1:8848/nacos/
+
+## 快速开始 docker-compose
 
 打开命令窗口执行：
 
 * Clone project
   
-  ```powershell
+  ```shell
   git clone --depth 1 https://github.com/onewe/nacos-docker.git
   cd nacos-docker
   ```
 
 * Standalone Derby
   
-  ```powershell
+  ```shell
   docker-compose -f example/standalone-derby/docker-compose.yaml up
   ```
 
 * Standalone Mysql
   
-  ```powershell
+  ```shell
   # Using mysql 5.7
   docker-compose -f example/standalone-mysql-5.7/docker-compose.yaml up
   
@@ -66,7 +85,7 @@
 
 * 集群模式
   
-  ```powershell
+  ```shell
   # Use ip model
   docker-compose -f example/cluster-ip/docker-compose.yaml up
   
@@ -77,30 +96,27 @@
   docker-compose -f example/cluster-embedded/docker-compose.yaml up 
   ```
 
-> 以上都是使用`nacos`的发行版本定制的镜像,若要使用最新的快照版本,则需要把`common-services.yaml`中的`latest`标签改成`snapshot`即可
-> 快照版本每隔8小时自动构建,构建与`nacos`的develop分支.
-
 * 服务注册示例
   
-  ```powershell
+  ```shell
   curl -X PUT 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
   ```
 
 * 服务发现示例
   
-  ```powershell
+  ```shell
   curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
   ```
 
 * 推送配置示例
   
-  ```powershell
+  ```shell
   curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test&content=helloWorld"
   ```
 
 * 获取配置示例
   
-  ```powershell
+  ```shell
     curl -X GET "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test"
   ```
 
@@ -133,3 +149,36 @@
 ## 高级配置
 
 如果上述配置列表无法满足,可以把`application.properties`文件挂载出来,根据需求进行定制.挂载路径:`./application.properties:/home/nacos/conf/application.properties`
+
+## 构建镜像
+
+* Clone project
+  
+  ```shell
+  git clone --depth 1 https://github.com/onewe/nacos-docker.git
+  cd nacos-docker/build
+  ```
+
+* Build nacos image
+  
+  ```shell
+  docker build --build-arg NACOS_VERSION=2.1.0 --target nacos-release -t nacos-server:v2.1.0 .
+  ```
+
+* Build mysql5.7 image
+  
+  ```shell
+  docker build --build-arg NACOS_VERSION=2.1.0 --target mysql5.7 -t mysql-57:v2.1.0 .
+  ```
+
+* Build mysql8 image
+  
+  ```shell
+  docker build --build-arg NACOS_VERSION=2.1.0 --target mysql8 -t mysql-8:v2.1.0 .
+  ```
+
+## 构建参数列表
+
+| 属性名称          | 描述       | 选项                             |
+| ------------- | -------- | ------------------------------ |
+| NACOS_VERSION | nacos版本号 | 注意版本号没有前缀`v`,例如:v2.1.0,则:2.1.0 |
