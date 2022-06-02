@@ -41,7 +41,11 @@ else
 fi
 
 if [[ "${NACOS_DEBUG}" == "y" ]]; then
-  JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
+  if [[ ! -z "${NACOS_DEBUG_PORT}" ]]; then
+    JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=${NACOS_DEBUG_PORT},server=y,suspend=n"
+  else
+    JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
+  fi
 fi
 
 if [[ "${MODE}" == "standalone" ]]; then

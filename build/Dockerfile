@@ -71,6 +71,8 @@ ENV MODE="standalone" \
     NACOS_DEBUG="n" \
     TOMCAT_ACCESSLOG_ENABLED="false" \
     TIME_ZONE="Asia/Shanghai"
+    
+ENV CLUSTER_CONF="${BASE_DIR}/conf/cluster.conf"
 
 ADD nacos-server-snapshot.tar.gz /home
 

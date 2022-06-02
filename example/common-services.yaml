@@ -1,7 +1,7 @@
 version: "2"
 services:
   nacos:
-    image: nacos-server:2.1.0
+    image: onewe/nacos-server:latest
     container_name: nacos
     healthcheck:
       test: ["CMD", "wget" ,"--spider","-q","http://127.0.0.1:8848/nacos/actuator/health"]
@@ -11,7 +11,7 @@ services:
       start_period: 30s
   nacos-mysql57:
     container_name: mysql57
-    image: nacos-mysql57:2.1.0
+    image: onewe/mysql-57:latest
     ports:
       - "3306:3306"
     healthcheck:
@@ -22,7 +22,7 @@ services:
       start_period: 30s
   nacos-mysql8:
     container_name: mysql8
-    image: nacos-mysql8:2.1.0
+    image: onewe/mysql-8:latest
     ports:
       - "3306:3306"
     healthcheck:

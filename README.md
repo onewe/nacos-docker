@@ -3,153 +3,133 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/onewe/nacos-server)
 ![Docker release build](https://img.shields.io/github/workflow/status/onewe/nacos-docker/Publish%20Docker%20release%20image?label=nacos-release-build)
 ![Docker snapshot build](https://img.shields.io/github/workflow/status/onewe/nacos-docker/Publish%20Docker%20snapshot%20image?label=nacos-snapshot-build)
-![Docker image version](https://img.shields.io/docker/v/onewe/nacos-server)
+![Docker image release version](https://img.shields.io/docker/v/onewe/nacos-server/v2.1.0)
+![Docker image snapshot version](https://img.shields.io/docker/v/onewe/nacos-server/snapshot)
 
-This project contains a Docker image meant to facilitate the deployment of [Nacos](https://github.com/alibaba/nacos).
+本项目是 [Nacos](https://github.com/alibaba/nacos) Server的docker镜像的build源码,以及Nacos server 在docker的单机和集群的运行例子.由于原始项目没有进行同步构建`mysql`镜像
+和没有快照版本,故而在原始项目上做了一些修改.
 
-[**中文**](README_ZH.md)
+改动:
 
-## Project directory
+- 同步构建mysql5.7
+- 通过构建mysql8.8
+- nacos启动脚本非root用户启动
+- docker-compose使用extends精简
+- 取消init.d目录的映射
+- 增加快照版本的构建
 
-* build：Nacos makes the source code of the docker image
-* env: Environment variable file for compose yaml
-* example: Docker compose example for Nacos server
+本项目是 [Nacos](https://github.com/alibaba/nacos) Server的docker镜像的build源码,以及Nacos server 在docker的单机和集群的运行例子.
 
-## Precautions
+## 项目目录
 
-* The **database master-slave image** has been removed, after the latest `nacos/nacos-server:latest` image. For specific
-  reasons, refer
-  to [Removing the Master-Slave Image Configuration](https://github.com/nacos-group/nacos-docker/wiki/%E7%A7%BB%E9%99%A4%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%BB%E4%BB%8E%E9%95%9C%E5%83%8F%E9%85%8D%E7%BD%AE)
-* Since Nacos 1.3.1 version, the database storage has been upgraded to 8.0, and it is backward compatible
-* If you use a custom database, you need to initialize
-  the [database script](https://github.com/alibaba/nacos/blob/develop/distribution/conf/nacos-mysql.sql) yourself for
-  the first time.
+* build：nacos 镜像制作的源码
+* env: docker compose 环境变量文件
+* example: docker-compose编排例子
 
-## Quick Start
+## 运行环境
 
-```shell
-docker run --name nacos-quick -e MODE=standalone -p 8848:8848 -p 9848:9848 -d nacos/nacos-server:2.0.2
-```
+* [Docker](https://www.docker.com/)
 
-## Advanced Usage
+### 注意事项
 
-* Tips: You can change the version of the Nacos image in the compose file from the following configuration.
-  `example/.env`
+* 从Nacos 1.3.1版本开始,数据库存储已经升级到8.0, 并且它向下兼容
+* 例子演示中使用的数据库是为了方便定制了官方Mysql镜像, 自动初始化的数据库脚本.
+* 如果你使用自定义数据库,
+  第一次启动Nacos前需要手动初始化 [数据库脚本](https://github.com/alibaba/nacos/blob/develop/distribution/conf/nacos-mysql.sql) .
 
-```dotenv
-NACOS_VERSION=2.1.0
-```
+## 快速开始
 
-Run the following command：
+打开命令窗口执行：
 
 * Clone project
-
+  
   ```powershell
-  git clone --depth 1 https://github.com/nacos-group/nacos-docker.git
+  git clone --depth 1 https://github.com/onewe/nacos-docker.git
   cd nacos-docker
   ```
 
-
 * Standalone Derby
-
+  
   ```powershell
-  docker-compose -f example/standalone-derby.yaml up
+  docker-compose -f example/standalone-derby/docker-compose.yaml up
   ```
-* Standalone Mysql
 
+* Standalone Mysql
+  
   ```powershell
   # Using mysql 5.7
-  docker-compose -f example/standalone-mysql-5.7.yaml up
-
+  docker-compose -f example/standalone-mysql-5.7/docker-compose.yaml up
+  
   # Using mysql 8
-  docker-compose -f example/standalone-mysql-8.yaml up
+  docker-compose -f example/standalone-mysql-8/docker-compose.yaml up
   ```
 
-* Cluster
-
+* 集群模式
+  
   ```powershell
-  docker-compose -f example/cluster-hostname.yaml up 
+  # Use ip model
+  docker-compose -f example/cluster-ip/docker-compose.yaml up
+  
+  # Use hostname model
+  docker-compose -f example/cluster-hostname/docker-compose.yaml up
+  
+  # Cluster model without mysql
+  docker-compose -f example/cluster-embedded/docker-compose.yaml up 
   ```
 
+> 以上都是使用`nacos`的发行版本定制的镜像,若要使用最新的快照版本,则需要把`common-services.yaml`中的`latest`标签改成`snapshot`即可
+> 快照版本每隔8小时自动构建,构建与`nacos`的develop分支.
 
-* Service registration
-
+* 服务注册示例
+  
   ```powershell
-  curl -X POST 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
-
+  curl -X PUT 'http://127.0.0.1:8848/nacos/v1/ns/instance?serviceName=nacos.naming.serviceName&ip=20.18.7.10&port=8080'
   ```
 
-* Service discovery
+* 服务发现示例
+  
+  ```powershell
+  curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
+  ```
 
-    ```powershell
-    curl -X GET 'http://127.0.0.1:8848/nacos/v1/ns/instance/list?serviceName=nacos.naming.serviceName'
-    ```
-
-* Publish config
-
+* 推送配置示例
+  
   ```powershell
   curl -X POST "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test&content=helloWorld"
   ```
 
-* Get config
-
+* 获取配置示例
+  
   ```powershell
     curl -X GET "http://127.0.0.1:8848/nacos/v1/cs/configs?dataId=nacos.cfg.dataId&group=test"
   ```
 
-
-* Open the Nacos console in your browser
-
+* 打开浏览器
+  
   link：http://127.0.0.1:8848/nacos/
 
-## Common property configuration
+## 属性配置列表
 
-| name                          | description                            | option                                 |
-| ----------------------------- | -------------------------------------- | -------------------------------------- |
-| MODE                          | cluster/standalone                     | cluster/standalone default **cluster** |
-| NACOS_SERVERS                 | nacos cluster address        | eg. ip1:port1 ip2:port2 ip3:port3             |
-| PREFER_HOST_MODE              | Whether hostname are supported         | hostname/ip default **ip**             |
-| NACOS_APPLICATION_PORT             | nacos server port                      | default **8848**                       |
-| NACOS_SERVER_IP             | custom nacos server ip when network was mutil-network                      |                         |
-| SPRING_DATASOURCE_PLATFORM    | standalone support mysql               | mysql / empty default empty            |
-| MYSQL_SERVICE_HOST | mysql  host |  |
-| MYSQL_SERVICE_PORT | mysql  database port | default : **3306** |
-| MYSQL_SERVICE_DB_NAME | mysql  database name |  |
-| MYSQL_SERVICE_USER | username of  database |  |
-| MYSQL_SERVICE_PASSWORD | password of  database |  |
-| MYSQL_DATABASE_NUM      | It indicates the number of database             | default :**1**                      |
-| MYSQL_SERVICE_DB_PARAM      | Database url parameter             |default:**
-characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false**                      |
-| JVM_XMS      |  -Xms             | default :1g                          |
-| JVM_XMX      |  -Xmx            | default :1g                          |
-| JVM_XMN      |  -Xmn           | default :512m                          |
-| JVM_MS      |  -XX:MetaspaceSize          | default :128m                          |
-| JVM_MMS      |  -XX:MaxMetaspaceSize          | default :320m                          |
-| NACOS_DEBUG      |  enable remote debug          | y/n default :n                          |
-| TOMCAT_ACCESSLOG_ENABLED      |  server.tomcat.accesslog.enabled         | default :false                          |
-| NACOS_AUTH_SYSTEM_TYPE      |  The auth system to use, currently only 'nacos' is supported        | default :nacos                          |
-| NACOS_AUTH_ENABLE      |  If turn on auth system        | default :false                          |
-| NACOS_AUTH_TOKEN_EXPIRE_SECONDS      |  The token expiration in seconds        | default :18000                          |
-| NACOS_AUTH_TOKEN      |  The default token        | default :SecretKey012345678901234567890123456789012345678901234567890123456789                          |
-| NACOS_AUTH_CACHE_ENABLE      |  Turn on/off caching of auth information. By turning on this switch, the update of auth information would have a 15 seconds delay.        | default : false                          |
-| MEMBER_LIST      |  Set the cluster list with a configuration file or command-line argument        | eg:192.168.16.101:8847?raft_port=8807,192.168.16.101?raft_port=8808,192.168.16.101:8849?raft_port=8809                          |
-| EMBEDDED_STORAGE      |    Use embedded storage in cluster mode without mysql      | `embedded` default : none                          |
-| NACOS_AUTH_CACHE_ENABLE      |    nacos.core.auth.caching.enabled      |  default : false                          |
-| NACOS_AUTH_USER_AGENT_AUTH_WHITE_ENABLE      |    nacos.core.auth.enable.userAgentAuthWhite      |  default : false                          |
-| NACOS_AUTH_IDENTITY_KEY      |    nacos.core.auth.server.identity.key      |  default : serverIdentity                          |
-| NACOS_AUTH_IDENTITY_VALUE      |    nacos.core.auth.server.identity.value      |  default : security                          |
-| NACOS_SECURITY_IGNORE_URLS      |    nacos.security.ignore.urls      |  default : `/,/error,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/v1/auth/**,/v1/console/health/**,/actuator/**,/v1/console/server/**`                          |
+| 属性名称                     | 描述                              | 选项                                                                                                     |
+| ------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| MODE                     | 系统启动方式: 集群/单机                   | cluster/standalone 默认 **standalone**                                                                   |
+| NACOS_SERVERS            | 集群地址                            | p1:port1空格ip2:port2 空格ip3:port3                                                                        |
+| NACOS_SERVER_IP          | 多网卡模式下可以指定IP                    | 默认为空,未配置                                                                                               |
+| NACOS_DEBUG              | 是否开启远程DEBUG                     | y/n 默认 :n, 默认debug端口:9555                                                                              |
+| NACOS_DEBUG_PORT         | 远程DEBUG端口                       | 默认为:9555                                                                                               |
+| PREFER_HOST_MODE         | 支持IP还是域名模式                      | hostname/ip 默认**IP**                                                                                   |
+| MEMBER_LIST              | 通过环境变量的方式设置集群地址                 | 例子:192.168.16.101:8847?raft_port=8807,192.168.16.101?raft_port=8808,192.168.16.101:8849?raft_port=8809 |
+| TOMCAT_ACCESSLOG_ENABLED | server.tomcat.accesslog.enabled | 默认 :false                                                                                              |
+| EMBEDDED_STORAGE         | 是否开启集群嵌入式存储模式                   | `true/false` 默认 : true                                                                                 |
+| USE_ONLY_SITE_INTERFACES |                                 | true/false 默认 false                                                                                    |
+| PREFERRED_NETWORKS       | 倾向使用的ip地址,正则表达式数组               | 未配置默认为空                                                                                                |
+| IGNORED_INTERFACES       | 忽略的ip地址,可以是正则表达式                | 未配置默认为空                                                                                                |
+| JVM_XMS                  | -Xms                            | 默认 :1g                                                                                                 |
+| JVM_XMX                  | -Xmx                            | 默认 :1g                                                                                                 |
+| JVM_XMN                  | -Xmn                            | 512m                                                                                                   |
+| JVM_MS                   | - XX:MetaspaceSize              | 默认 :128m                                                                                               |
+| JVM_MMS                  | -XX:MaxMetaspaceSize            | 默认 :320m                                                                                               |
 
-~~# Advanced configuration~~
+## 高级配置
 
-~~If the above property configuration list does not meet your requirements, you can mount the `custom.properties` file
-into the `/home/nacos/init.d/` directory of the container, where the spring properties can be configured, and the
-priority is higher than `application.properties` file~~
-
-## Nacos + Grafana + Prometheus
-
-Usage reference：[Nacos monitor-guide](https://nacos.io/zh-cn/docs/monitor-guide.html)
-
-**Note**:  When Grafana creates a new data source, the data source address must be **http://prometheus:9090**
-
-
+如果上述配置列表无法满足,可以把`application.properties`文件挂载出来,根据需求进行定制.挂载路径:`./application.properties:/home/nacos/conf/application.properties`
