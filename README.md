@@ -12,7 +12,7 @@
 改动:
 
 - 同步构建mysql5.7
-- 通过构建mysql8.8
+- 同步构建mysql8.8
 - nacos启动脚本非root用户启动
 - docker-compose使用extends精简
 - 取消init.d目录的映射
