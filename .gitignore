@@ -1,3 +1,4 @@
 *.log
 *.current
 .DS_Store
+.idea
