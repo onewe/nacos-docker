@@ -22,26 +22,27 @@ ENV MODE="standalone" \
 
 ENV CLUSTER_CONF="${BASE_DIR}/conf/cluster.conf"
 
-RUN set -eux && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends wget && \
-    apt-get install -y --no-install-recommends openjdk-8-jre && \
-    apt-get install -y --no-install-recommends tzdata && \
-    wget --no-check-certificate  https://github.com/alibaba/nacos/releases/download/${NACOS_VERSION}${HOT_FIX_FLAG}/nacos-server-${NACOS_VERSION}.tar.gz -P /home && \
-    tar -xzvf /home/nacos-server-${NACOS_VERSION}.tar.gz -C /home && \
-    rm -rf /home/nacos-server-${NACOS_VERSION}.tar.gz && \
-    mkdir -p ${BASE_DIR}/logs && \
-	touch ${BASE_DIR}/logs/start.out && \
-    touch ${BASE_DIR}/logs/start.error && \
-	ln -sf /dev/stdout ${BASE_DIR}/logs/start.out && \
-	ln -sf /dev/stderr ${BASE_DIR}/logs/start.error && \
-    groupadd -r ${NACOS_USER} && useradd -r -g ${NACOS_USER} ${NACOS_GROUP} && \
-    chown -R ${NACOS_USER}:${NACOS_GROUP} ${BASE_DIR} && \
-    ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && dpkg-reconfigure -f noninteractive tzdata && \
-    rm -rf ${BASE_DIR}/bin && \
-    rm -rf ${BASE_DIR}/conf/1.4.0-ipv6_support-update.sql ${BASE_DIR}/conf/application.properties.example ${BASE_DIR}/conf/cluster.conf.example && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && apt-get install -y --no-install-recommends openjdk-8-jre \
+    && apt-get install -y --no-install-recommends tzdata \
+    && wget --no-check-certificate  https://github.com/alibaba/nacos/releases/download/${NACOS_VERSION}${HOT_FIX_FLAG}/nacos-server-${NACOS_VERSION}.tar.gz -P /home \
+    && tar -xzvf /home/nacos-server-${NACOS_VERSION}.tar.gz -C /home \
+    && rm -rf /home/nacos-server-${NACOS_VERSION}.tar.gz \
+    && mkdir -p ${BASE_DIR}/logs \
+	  && touch ${BASE_DIR}/logs/start.out \
+    && touch ${BASE_DIR}/logs/start.error \
+  	&& ln -sf /dev/stdout ${BASE_DIR}/logs/start.out \
+	  && ln -sf /dev/stderr ${BASE_DIR}/logs/start.error \
+    && groupadd -r ${NACOS_USER} \
+    && useradd -r -g ${NACOS_USER} ${NACOS_GROUP} \
+    && chown -R ${NACOS_USER}:${NACOS_GROUP} ${BASE_DIR} \
+    && ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && dpkg-reconfigure -f noninteractive tzdata \
+    && rm -rf ${BASE_DIR}/bin \
+    && rm -rf ${BASE_DIR}/conf/1.4.0-ipv6_support-update.sql ${BASE_DIR}/conf/application.properties.example ${BASE_DIR}/conf/cluster.conf.example \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 WORKDIR ${BASE_DIR}
 USER ${NACOS_USER}
@@ -76,23 +77,25 @@ ENV CLUSTER_CONF="${BASE_DIR}/conf/cluster.conf"
 
 ADD nacos-server-snapshot.tar.gz /home
 
-RUN set -eux && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends wget && \
-    apt-get install -y --no-install-recommends openjdk-8-jre && \
-    apt-get install -y --no-install-recommends tzdata && \
-    mkdir -p ${BASE_DIR}/logs && \
-	touch ${BASE_DIR}/logs/start.out && \
-    touch ${BASE_DIR}/logs/start.error && \
-	ln -sf /dev/stdout ${BASE_DIR}/logs/start.out && \
-	ln -sf /dev/stderr ${BASE_DIR}/logs/start.error && \
-    groupadd -r ${NACOS_USER} && useradd -r -g ${NACOS_USER} ${NACOS_GROUP} && \
-    chown -R ${NACOS_USER}:${NACOS_GROUP} ${BASE_DIR} && \
-    ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && dpkg-reconfigure -f noninteractive tzdata && \
-    rm -rf ${BASE_DIR}/bin && \
-    rm -rf ${BASE_DIR}/conf/1.4.0-ipv6_support-update.sql ${BASE_DIR}/conf/application.properties.example ${BASE_DIR}/conf/cluster.conf.example && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
+RUN set -eux \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && apt-get install -y --no-install-recommends openjdk-8-jre \
+    && apt-get install -y --no-install-recommends tzdata \
+    && mkdir -p ${BASE_DIR}/logs \
+	  && touch ${BASE_DIR}/logs/start.out \
+    && touch ${BASE_DIR}/logs/start.error \
+	  && ln -sf /dev/stdout ${BASE_DIR}/logs/start.out \
+	  && ln -sf /dev/stderr ${BASE_DIR}/logs/start.error \
+    && groupadd -r ${NACOS_USER} \
+    && useradd -r -g ${NACOS_USER} ${NACOS_GROUP} \
+    && chown -R ${NACOS_USER}:${NACOS_GROUP} ${BASE_DIR} \
+    && ln -fs /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
+    && rm -rf ${BASE_DIR}/bin \
+    && rm -rf ${BASE_DIR}/conf/1.4.0-ipv6_support-update.sql ${BASE_DIR}/conf/application.properties.example ${BASE_DIR}/conf/cluster.conf.example \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 WORKDIR ${BASE_DIR}
 USER ${NACOS_USER}
