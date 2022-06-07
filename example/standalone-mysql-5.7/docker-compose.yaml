@@ -8,7 +8,6 @@ services:
     env_file:
       - ./env/nacos.env
     volumes:
-      - ./init.d/:/home/nacos/init.d/
       - ./conf/application.properties:/home/nacos/conf/application.properties
     ports:
       - "8848:8848"
