@@ -6,14 +6,14 @@
 ![Docker image release version](https://img.shields.io/docker/v/onewe/nacos-server/v2.1.0)
 ![Docker image snapshot version](https://img.shields.io/docker/v/onewe/nacos-server/snapshot)
 
-This project is [Nacos](https://github.com/alibaba/nacos) Server side docker image source code, and Nacos server side docker standalone mode and cluster mode demo.Since the original project did not have a synchronous build`mysql`image
-and do not have snapshot version,So made some modifications on the original project.
+This project is [Nacos](https://github.com/alibaba/nacos) Server-side docker image source code, and Nacos server-side docker standalone mode and cluster mode demo. Since the original project did not have a synchronous build`mysql`image
+and do not have a snapshot version, some modifications are made to the original project.
 
 Change list:
 
 - Synchronous build mysql5.7
 - Synchronous build mysql8.8
-- Start nacos without use root
+- Start nacos without using root
 - Simplify build scripts with docker-compose extends
 - Remove init.d directory mapping
 - Increase the build of the snapshot version
@@ -32,10 +32,10 @@ This project is [Nacos](https://github.com/alibaba/nacos) Server side docker ima
 
 ### Precautions
 
-* Since Nacos version 1.3.1,database has been upgraded to 8.0, and downward compatibility.
+* Since Nacos version 1.3.1, the database has been upgraded to 8.0, and downward compatibility.
 * The database used in the example demonstration is to customize the official Mysql image and automatically initialize the database script for convenience.
-* If you need to customize database,
-  Manual initialization is required before starting Nacos for the first time [Database script](https://github.com/alibaba/nacos/blob/develop/distribution/conf/nacos-mysql.sql) .
+* If you need to customize the database,
+  Manual initialization is required before starting Nacos for the first time [Database script](https://github.com/alibaba/nacos/blob/develop/distribution/conf/nacos-mysql.sql).
 * The snapshot version is built every 8 hours. If you need to use the snapshot version for practice, change the image label to`snapshot`
 
 ## Quick start docker
@@ -148,7 +148,7 @@ Open terminal and execute：
 
 ## Advanced configuration
 
-If the above configuration can not be satisfied,You can mount the `application.properties` file and customize it according to your needs.mount path:`./application.properties:/home/nacos/conf/application.properties`
+If the above configuration cannot be satisfied, mount the 'application.properties' file and customize it according to your needs. Mount path:`./application.properties:/home/nacos/conf/application.properties`
 
 ## Build image
 
