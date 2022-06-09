@@ -51,8 +51,6 @@ COPY --chown=${NACOS_USER}:${NACOS_GROUP} ./docker-startup.sh bin/docker-startup
 
 EXPOSE 8848 9848 9849 9555
 
-#CMD [ "sh", "-c", "echo $HOME" ]
-
 ENTRYPOINT [ "bin/docker-startup.sh" ]
 
 
