@@ -25,7 +25,7 @@ ENV CLUSTER_CONF="${BASE_DIR}/conf/cluster.conf"
 RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends wget \
-    && apt-get install -y --no-install-recommends openjdk-8-jre \
+    && apt-get install -y --no-install-recommends openjdk-11-jre \
     && apt-get install -y --no-install-recommends tzdata \
     && wget --no-check-certificate  https://github.com/alibaba/nacos/releases/download/${NACOS_VERSION}${HOT_FIX_FLAG}/nacos-server-${NACOS_VERSION}.tar.gz -P /home \
     && tar -xzvf /home/nacos-server-${NACOS_VERSION}.tar.gz -C /home \
@@ -50,6 +50,8 @@ USER ${NACOS_USER}
 COPY --chown=${NACOS_USER}:${NACOS_GROUP} ./docker-startup.sh bin/docker-startup.sh
 
 EXPOSE 8848 9848 9849 9555
+
+#CMD [ "sh", "-c", "echo $HOME" ]
 
 ENTRYPOINT [ "bin/docker-startup.sh" ]
 
@@ -80,7 +82,7 @@ ADD nacos-server-snapshot.tar.gz /home
 RUN set -eux \
     && apt-get update \
     && apt-get install -y --no-install-recommends wget \
-    && apt-get install -y --no-install-recommends openjdk-8-jre \
+    && apt-get install -y --no-install-recommends openjdk-11-jre \
     && apt-get install -y --no-install-recommends tzdata \
     && mkdir -p ${BASE_DIR}/logs \
 	  && touch ${BASE_DIR}/logs/start.out \
