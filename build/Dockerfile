@@ -116,7 +116,7 @@ ENV NACOS_BASE_DIR="/home/nacos" \
     MYSQL_USER="nacos" \
     MYSQL_PASSWORD="nacos"
 
-COPY --from=nacos-release ${NACOS_BASE_DIR}/conf/mysql-schema.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
+COPY --from=nacos-release ${NACOS_BASE_DIR}/conf/nacos-mysql.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
 
 FROM mysql:5.7 as mysql5.7-snapshot
 
@@ -126,7 +126,7 @@ ENV NACOS_BASE_DIR="/home/nacos" \
     MYSQL_USER="nacos" \
     MYSQL_PASSWORD="nacos"
 
-COPY --from=nacos-snapshot ${NACOS_BASE_DIR}/conf/mysql-schema.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
+COPY --from=nacos-snapshot ${NACOS_BASE_DIR}/conf/nacos-mysql.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
 
 
 FROM mysql:8 as mysql8
@@ -137,7 +137,7 @@ ENV NACOS_BASE_DIR="/home/nacos" \
     MYSQL_USER="nacos" \
     MYSQL_PASSWORD="nacos"
 
-COPY --from=nacos-release ${NACOS_BASE_DIR}/conf/mysql-schema.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
+COPY --from=nacos-release ${NACOS_BASE_DIR}/conf/nacos-mysql.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
 
 FROM mysql:8 as mysql8-snapshot
 
@@ -147,4 +147,4 @@ ENV NACOS_BASE_DIR="/home/nacos" \
     MYSQL_USER="nacos" \
     MYSQL_PASSWORD="nacos"
 
-COPY --from=nacos-snapshot ${NACOS_BASE_DIR}/conf/mysql-schema.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
+COPY --from=nacos-snapshot ${NACOS_BASE_DIR}/conf/nacos-mysql.sql  /docker-entrypoint-initdb.d/nacos-mysql.sql
