@@ -5,6 +5,8 @@ services:
       file: ../common-services.yaml
       service: nacos
     container_name: nacos-standalone
+    volumes:
+      - ./conf/application.properties:/home/nacos/conf/application.properties
     environment:
       - PREFER_HOST_MODE=ip
     ports:
