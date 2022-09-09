@@ -8,6 +8,7 @@ services:
     hostname: nacos1
     volumes:
       - ./cluster-logs/nacos1:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -29,6 +30,7 @@ services:
     hostname: nacos2
     volumes:
       - ./cluster-logs/nacos2:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
     ports:
       - "8849:8848"
       - "9849:9848"
@@ -48,6 +50,7 @@ services:
     hostname: nacos3
     volumes:
       - ./cluster-logs/nacos3:/home/nacos/logs
+      - ./conf/application.properties:/home/nacos/conf/application.properties
     ports:
       - "8850:8848"
       - "9850:9848"

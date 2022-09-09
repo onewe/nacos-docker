@@ -1,6 +1,6 @@
 FROM ubuntu:18.04 as nacos-release
 
-ARG NACOS_VERSION=2.1.0
+ARG NACOS_VERSION=2.1.1
 ARG HOT_FIX_FLAG=""
 
 # set environment
